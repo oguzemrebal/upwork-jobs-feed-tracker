@@ -1,21 +1,12 @@
-const App = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-};
+import { Route, Switch, HashRouter as Router } from 'react-router-dom';
+
+const App = () => (
+  <Router hashType="noslash">
+    <Switch>
+      <Route path="/options">options</Route>
+      <Route path="/popup">popup</Route>
+    </Switch>
+  </Router>
+);
 
 export default App;
