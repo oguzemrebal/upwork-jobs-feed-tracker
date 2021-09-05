@@ -10,7 +10,7 @@ const sections = [
 
 const Header = () => (
   <AppBar elevation={0} position="static" style={{ background: '#242c38' }}>
-    <Container>
+    <Container maxWidth="md">
       <Toolbar disableGutters>
         <Box mr={4} pt={1}>
           <img src={logo} alt="UpToolkit" height="30" />
