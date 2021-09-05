@@ -1,6 +1,6 @@
 import React from 'react';
+import '@fontsource/inter';
 import ReactDOM from 'react-dom';
-
 import App from './components/App/App';
 
 ReactDOM.render(
