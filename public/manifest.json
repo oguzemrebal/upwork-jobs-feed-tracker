@@ -1,7 +1,7 @@
 {
-  "name": "Up-toolkit",
+  "name": "UpToolkit",
   "description": "THE toolkit that every Upwork freelancer should have",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "manifest_version": 3,
   "options_page": "index.html#options",
   "action": {
