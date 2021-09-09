@@ -20,8 +20,6 @@ import {
   ListItemSecondaryAction,
 } from '@material-ui/core';
 
-import { useAppDispatch, useAppSelector } from '../../hooks/store';
-
 import {
   setSettings,
   selectFetchingInterval,
@@ -30,14 +28,19 @@ import {
   selectIsNotificationSoundEnabled,
 } from '../../store/settings';
 
+import { useAppDispatch, useAppSelector } from '../../hooks/store';
+import { fetchingIntervalOptions } from '../../store/settings/types';
+
 const OptionSidebar = () => {
   const dispatch = useAppDispatch();
 
   const isFetchingEnabled = useAppSelector(selectIsFetchingEnabled);
   const fetchingInterval = useAppSelector(selectFetchingInterval);
+
   const isNotificationSoundEnabled = useAppSelector(
     selectIsNotificationSoundEnabled
   );
+
   const notificationSoundVolume = useAppSelector(selectNotificationSoundVolume);
 
   return (
@@ -72,9 +75,11 @@ const OptionSidebar = () => {
                   dispatch(setSettings({ fetchingInterval: e.target.value }))
                 }
               >
-                <MenuItem value={1}>1 minute</MenuItem>
-                <MenuItem value={5}>5 minutes</MenuItem>
-                <MenuItem value={10}>10 minutes</MenuItem>
+                {fetchingIntervalOptions.map((interval) => (
+                  <MenuItem value={1} key={`interval-${interval}`}>
+                    {interval} minute{interval > 1 ? 's' : null}
+                  </MenuItem>
+                ))}
               </Select>
             </ListItemSecondaryAction>
           </ListItem>

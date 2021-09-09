@@ -1,6 +1,12 @@
-import { createTheme, PaletteType } from '@material-ui/core';
+import {
+  PaletteType,
+  createTheme,
+  unstable_createMuiStrictModeTheme,
+} from '@material-ui/core';
 
-export const theme = {
+import { isProduction } from './utils/environment';
+
+export const themeConfig = {
   palette: {
     type: 'dark' as PaletteType,
     primary: {
@@ -15,4 +21,8 @@ export const theme = {
   },
 };
 
-export default createTheme(theme);
+const theme = isProduction()
+  ? createTheme(themeConfig)
+  : unstable_createMuiStrictModeTheme(themeConfig);
+
+export default theme;
