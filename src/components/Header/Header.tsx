@@ -1,6 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { Box, Link, AppBar, Toolbar, Container } from '@material-ui/core';
+import { Box, Link, AppBar, Toolbar } from '@material-ui/core';
 
+import Container from '../Container/Container';
 import logo from '../../assets/images/logo.svg';
 
 const sections = [
@@ -10,7 +11,7 @@ const sections = [
 
 const Header = () => (
   <AppBar elevation={0} position="static" style={{ background: '#242c38' }}>
-    <Container maxWidth="md">
+    <Container>
       <Toolbar disableGutters>
         <Box mr={4} pt={1}>
           <img src={logo} alt="UpToolkit" height="30" />

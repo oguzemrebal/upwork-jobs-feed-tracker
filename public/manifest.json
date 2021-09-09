@@ -6,5 +6,8 @@
   "options_page": "index.html#options",
   "action": {
     "default_popup": "index.html#popup"
-  }
+  },
+  "permissions": [
+    "storage"
+  ]
 }

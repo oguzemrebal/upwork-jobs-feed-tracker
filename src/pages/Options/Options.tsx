@@ -1,9 +1,10 @@
+import { Box } from '@material-ui/core';
 import { Route, Switch } from 'react-router-dom';
-import { Box, Container } from '@material-ui/core';
 
 import Feed from './Feed/Feed';
 import CoverLetter from './CoverLetter/CoverLetter';
 import Header from '../../components/Header/Header';
+import Container from '../../components/Container/Container';
 
 const pages = [
   { path: '/options', component: Feed },
@@ -14,7 +15,7 @@ const Options = () => (
   <Container maxWidth={false} disableGutters>
     <Header />
 
-    <Container maxWidth="md">
+    <Container>
       <Box py={3}>
         <Switch>
           {pages.map(({ path, component }) => (
