@@ -25,7 +25,7 @@ import {
 import {
   saveSettings,
   fetchSettings,
-  selectSettingsLoading,
+  selectLoading,
   selectFetchingInterval,
   selectIsFetchingEnabled,
   selectNotificationSoundVolume,
@@ -38,9 +38,9 @@ import { fetchingIntervalOptions } from '../../../../store/settings/types';
 const Sidebar = () => {
   const dispatch = useAppDispatch();
 
-  const isSettingsLoading = useAppSelector(selectSettingsLoading);
   const isFetchingEnabled = useAppSelector(selectIsFetchingEnabled);
   const fetchingInterval = useAppSelector(selectFetchingInterval);
+  const isLoading = useAppSelector(selectLoading);
 
   const isNotificationSoundEnabled = useAppSelector(
     selectIsNotificationSoundEnabled
@@ -72,7 +72,7 @@ const Sidebar = () => {
               <Switch
                 color="primary"
                 checked={isFetchingEnabled}
-                disabled={isSettingsLoading}
+                disabled={isLoading}
                 onChange={(e) =>
                   dispatch(
                     saveSettings({ isFetchingEnabled: e.target.checked })
@@ -90,7 +90,7 @@ const Sidebar = () => {
             <ListItemSecondaryAction>
               <Select
                 value={fetchingInterval}
-                disabled={isSettingsLoading || !isFetchingEnabled}
+                disabled={isLoading || !isFetchingEnabled}
                 onChange={(e) =>
                   dispatch(
                     saveSettings({ fetchingInterval: e.target.value as number })
@@ -115,7 +115,7 @@ const Sidebar = () => {
               <Switch
                 color="primary"
                 checked={isNotificationSoundEnabled}
-                disabled={isSettingsLoading || !isFetchingEnabled}
+                disabled={isLoading || !isFetchingEnabled}
                 onChange={(e) =>
                   dispatch(
                     saveSettings({
@@ -144,9 +144,7 @@ const Sidebar = () => {
                   )
                 }
                 disabled={
-                  isSettingsLoading ||
-                  !isFetchingEnabled ||
-                  !isNotificationSoundEnabled
+                  isLoading || !isFetchingEnabled || !isNotificationSoundEnabled
                 }
               />
             </Box>

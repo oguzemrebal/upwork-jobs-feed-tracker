@@ -20,22 +20,22 @@ export const initialState: SettingsState = {
 export const selectSettings = (state: RootState): SettingsState =>
   state.settings;
 
-export const selectSettingsLoading = (state: RootState) =>
+export const selectLoading = (state: RootState) =>
   selectSettings(state).loading;
 
-export const selectSettingsConfig = (state: RootState) => state.settings.config;
+export const selectConfig = (state: RootState) => state.settings.config;
 
 export const selectIsFetchingEnabled = (state: RootState) =>
-  selectSettingsConfig(state).isFetchingEnabled;
+  selectConfig(state).isFetchingEnabled;
 
 export const selectFetchingInterval = (state: RootState) =>
-  selectSettingsConfig(state).fetchingInterval;
+  selectConfig(state).fetchingInterval;
 
 export const selectIsNotificationSoundEnabled = (state: RootState) =>
-  selectSettingsConfig(state).isNotificationSoundEnabled;
+  selectConfig(state).isNotificationSoundEnabled;
 
 export const selectNotificationSoundVolume = (state: RootState) =>
-  selectSettingsConfig(state).notificationSoundVolume;
+  selectConfig(state).notificationSoundVolume;
 
 export const selectRequestInProgress = (state: RootState) =>
   state.settings.loading;
@@ -52,7 +52,7 @@ export const fetchSettings = createAsyncThunk('settings/fetch', async () => {
 export const saveSettings = createAsyncThunk(
   'settings/save',
   async (partialConfig: Partial<Settings>, { getState }) => {
-    const oldConfig = selectSettingsConfig(getState() as RootState);
+    const oldConfig = selectConfig(getState() as RootState);
 
     const payload = await setItem(SETTINGS, {
       ...oldConfig,
