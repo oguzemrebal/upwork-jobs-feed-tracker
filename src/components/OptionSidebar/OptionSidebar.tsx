@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import {
   Wifi,
   Update,
@@ -21,7 +23,9 @@ import {
 } from '@material-ui/core';
 
 import {
-  setSettings,
+  saveSettings,
+  fetchSettings,
+  selectSettingsLoading,
   selectFetchingInterval,
   selectIsFetchingEnabled,
   selectNotificationSoundVolume,
@@ -34,6 +38,7 @@ import { fetchingIntervalOptions } from '../../store/settings/types';
 const OptionSidebar = () => {
   const dispatch = useAppDispatch();
 
+  const isSettingsLoading = useAppSelector(selectSettingsLoading);
   const isFetchingEnabled = useAppSelector(selectIsFetchingEnabled);
   const fetchingInterval = useAppSelector(selectFetchingInterval);
 
@@ -42,6 +47,10 @@ const OptionSidebar = () => {
   );
 
   const notificationSoundVolume = useAppSelector(selectNotificationSoundVolume);
+
+  useEffect(() => {
+    dispatch(fetchSettings());
+  }, [dispatch]);
 
   return (
     <Card>
@@ -56,8 +65,11 @@ const OptionSidebar = () => {
               <Switch
                 color="primary"
                 checked={isFetchingEnabled}
+                disabled={isSettingsLoading}
                 onChange={(e) =>
-                  dispatch(setSettings({ isFetchingEnabled: e.target.checked }))
+                  dispatch(
+                    saveSettings({ isFetchingEnabled: e.target.checked })
+                  )
                 }
               />
             </ListItemSecondaryAction>
@@ -71,12 +83,15 @@ const OptionSidebar = () => {
             <ListItemSecondaryAction>
               <Select
                 value={fetchingInterval}
+                disabled={isSettingsLoading}
                 onChange={(e) =>
-                  dispatch(setSettings({ fetchingInterval: e.target.value }))
+                  dispatch(
+                    saveSettings({ fetchingInterval: e.target.value as number })
+                  )
                 }
               >
                 {fetchingIntervalOptions.map((interval) => (
-                  <MenuItem value={1} key={`interval-${interval}`}>
+                  <MenuItem value={interval} key={`interval-${interval}`}>
                     {interval} minute{interval > 1 ? 's' : null}
                   </MenuItem>
                 ))}
@@ -92,10 +107,11 @@ const OptionSidebar = () => {
             <ListItemSecondaryAction>
               <Switch
                 color="primary"
+                disabled={isSettingsLoading}
                 checked={isNotificationSoundEnabled}
                 onChange={(e) =>
                   dispatch(
-                    setSettings({
+                    saveSettings({
                       isNotificationSoundEnabled: e.target.checked,
                     })
                   )
@@ -112,9 +128,11 @@ const OptionSidebar = () => {
             <Box flex={5} display="flex">
               <Slider
                 value={notificationSoundVolume}
-                disabled={!isNotificationSoundEnabled}
-                onChange={(event, value: number | number[]) =>
-                  dispatch(setSettings({ notificationSoundVolume: value }))
+                disabled={!isNotificationSoundEnabled || isSettingsLoading}
+                onChange={(e, value) =>
+                  dispatch(
+                    saveSettings({ notificationSoundVolume: value as number })
+                  )
                 }
               />
             </Box>

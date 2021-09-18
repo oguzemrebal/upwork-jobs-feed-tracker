@@ -9,3 +9,8 @@ export interface Settings {
   notificationSoundVolume: number;
   isNotificationSoundEnabled: boolean;
 }
+
+export interface SettingsState {
+  config: Settings;
+  loading: boolean;
+}
