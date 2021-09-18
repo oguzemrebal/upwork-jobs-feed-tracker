@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   Wifi,
@@ -48,9 +48,16 @@ const Sidebar = () => {
 
   const notificationSoundVolume = useAppSelector(selectNotificationSoundVolume);
 
+  const [volumeLevel, setVolumeLevel] = useState(notificationSoundVolume);
+
   useEffect(() => {
     dispatch(fetchSettings());
   }, [dispatch]);
+
+  useEffect(
+    () => setVolumeLevel(notificationSoundVolume),
+    [notificationSoundVolume]
+  );
 
   return (
     <Card>
@@ -83,7 +90,7 @@ const Sidebar = () => {
             <ListItemSecondaryAction>
               <Select
                 value={fetchingInterval}
-                disabled={isSettingsLoading}
+                disabled={isSettingsLoading || !isFetchingEnabled}
                 onChange={(e) =>
                   dispatch(
                     saveSettings({ fetchingInterval: e.target.value as number })
@@ -107,8 +114,8 @@ const Sidebar = () => {
             <ListItemSecondaryAction>
               <Switch
                 color="primary"
-                disabled={isSettingsLoading}
                 checked={isNotificationSoundEnabled}
+                disabled={isSettingsLoading || !isFetchingEnabled}
                 onChange={(e) =>
                   dispatch(
                     saveSettings({
@@ -127,12 +134,19 @@ const Sidebar = () => {
             <ListItemText>Volume</ListItemText>
             <Box flex={5} display="flex">
               <Slider
-                value={notificationSoundVolume}
-                disabled={!isNotificationSoundEnabled || isSettingsLoading}
-                onChange={(e, value) =>
+                value={volumeLevel}
+                onChange={(e, value) => setVolumeLevel(value as number)}
+                onChangeCommitted={(e, value) =>
                   dispatch(
-                    saveSettings({ notificationSoundVolume: value as number })
+                    saveSettings({
+                      notificationSoundVolume: value as number,
+                    })
                   )
+                }
+                disabled={
+                  isSettingsLoading ||
+                  !isFetchingEnabled ||
+                  !isNotificationSoundEnabled
                 }
               />
             </Box>

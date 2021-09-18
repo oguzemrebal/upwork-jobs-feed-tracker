@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import { Settings, SettingsState } from './types';
 import { getItem, setItem } from '../../utils/storage';
+import { playNotificationSound } from '../../utils/audio';
 
 export const SETTINGS = 'SETTINGS';
 
@@ -58,8 +59,12 @@ export const saveSettings = createAsyncThunk(
       ...partialConfig,
     });
 
-    // // TODO Add UI notification about successful saving
+    // TODO Add UI notification about successful saving
     console.log('settings saved');
+
+    if (!!partialConfig.notificationSoundVolume) {
+      playNotificationSound(partialConfig.notificationSoundVolume);
+    }
 
     return payload;
   }
