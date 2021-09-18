@@ -30,12 +30,12 @@ import {
   selectIsFetchingEnabled,
   selectNotificationSoundVolume,
   selectIsNotificationSoundEnabled,
-} from '../../store/settings';
+} from '../../../../store/settings';
 
-import { useAppDispatch, useAppSelector } from '../../hooks/store';
-import { fetchingIntervalOptions } from '../../store/settings/types';
+import { useAppDispatch, useAppSelector } from '../../../../hooks/store';
+import { fetchingIntervalOptions } from '../../../../store/settings/types';
 
-const OptionSidebar = () => {
+const Sidebar = () => {
   const dispatch = useAppDispatch();
 
   const isSettingsLoading = useAppSelector(selectSettingsLoading);
@@ -143,4 +143,4 @@ const OptionSidebar = () => {
   );
 };
 
-export default OptionSidebar;
+export default Sidebar;

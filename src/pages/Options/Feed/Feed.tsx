@@ -1,11 +1,11 @@
 import { Box, Grid, Hidden } from '@material-ui/core';
-import OptionSidebar from '../../../components/OptionSidebar/OptionSidebar';
+import Sidebar from './Sidebar/Sidebar';
 
 const Feed = () => (
   <Grid container spacing={3}>
     <Hidden smDown>
       <Grid item md={4} sm={3}>
-        <OptionSidebar />
+        <Sidebar />
       </Grid>
     </Hidden>
 
