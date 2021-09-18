@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { RootState } from '../index';
 import { Settings, SettingsState } from './types';
@@ -11,9 +11,9 @@ export const initialState: SettingsState = {
   loading: false,
   config: {
     fetchingInterval: 1,
-    isFetchingEnabled: false,
+    isFetchingEnabled: true,
     notificationSoundVolume: 100,
-    isNotificationSoundEnabled: false,
+    isNotificationSoundEnabled: true,
   },
 };
 
@@ -70,38 +70,40 @@ export const saveSettings = createAsyncThunk(
   }
 );
 
+export const onSettingsPending = (state: SettingsState) => ({
+  ...state,
+  loading: true,
+});
+
+export const onSettingsFulfilled = (
+  state: SettingsState,
+  action: PayloadAction<Partial<Settings>>
+) => ({
+  ...state,
+  loading: false,
+  config: {
+    ...state.config,
+    ...action.payload,
+  },
+});
+
+export const onSettingsRejected = (state: SettingsState) => ({
+  ...state,
+  loading: false,
+});
+
 export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchSettings.pending, (state) => ({
-      ...state,
-      loading: true,
-    }));
-    builder.addCase(fetchSettings.fulfilled, (state, action) => ({
-      ...state,
-      loading: false,
-      config: action.payload,
-    }));
-    builder.addCase(fetchSettings.rejected, (state) => ({
-      ...state,
-      loading: false,
-    }));
+    builder.addCase(fetchSettings.pending, onSettingsPending);
+    builder.addCase(fetchSettings.fulfilled, onSettingsFulfilled);
+    builder.addCase(fetchSettings.rejected, onSettingsRejected);
 
-    builder.addCase(saveSettings.pending, (state) => ({
-      ...state,
-      loading: true,
-    }));
-    builder.addCase(saveSettings.fulfilled, (state, action) => ({
-      ...state,
-      loading: false,
-      config: action.payload,
-    }));
-    builder.addCase(saveSettings.rejected, (state) => ({
-      ...state,
-      loading: false,
-    }));
+    builder.addCase(saveSettings.pending, onSettingsPending);
+    builder.addCase(saveSettings.fulfilled, onSettingsFulfilled);
+    builder.addCase(saveSettings.rejected, onSettingsRejected);
   },
 });
 

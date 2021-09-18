@@ -8,6 +8,12 @@
     "default_popup": "index.html#popup"
   },
   "permissions": [
-    "storage"
+    "alarms",
+    "storage",
+    "background",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://*.upwork.com/"
   ]
 }

@@ -1,12 +1,5 @@
+import { browser } from './browser';
 import { isProduction } from './environment';
-
-declare global {
-  interface Window {
-    chrome: any;
-  }
-}
-
-const chrome = window.chrome;
 
 export const setLocalStorageItem = (key: string, value: any): Promise<any> =>
   new Promise((resolve, reject) => {
@@ -29,19 +22,19 @@ export const getLocalStorageItem = (key: string): Promise<any> =>
 
 export const setStorageItem = (key: string, value: any): Promise<any> =>
   new Promise((resolve, reject) => {
-    chrome.storage.sync.set({ [key]: value }, () =>
-      chrome.runtime.lastError
-        ? reject(chrome.runtime.lastError)
+    browser.storage.sync.set({ [key]: value }, () =>
+      browser.runtime.lastError
+        ? reject(browser.runtime.lastError)
         : resolve(value)
     );
   });
 
 export const getStorageItem = (key: string): Promise<any> =>
   new Promise((resolve, reject) => {
-    chrome.storage.sync.get(key, (item: any) =>
-      chrome.runtime.lastError
-        ? reject(chrome.runtime.lastError)
-        : resolve(item)
+    browser.storage.sync.get(key, (item: any) =>
+      browser.runtime.lastError
+        ? reject(browser.runtime.lastError)
+        : resolve(item[key])
     );
   });
 
