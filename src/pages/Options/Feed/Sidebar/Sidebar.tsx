@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import {
-  Wifi,
   Update,
   VolumeUp,
+  PowerSettingsNew,
   NotificationsActive,
 } from '@material-ui/icons';
 
@@ -23,41 +23,77 @@ import {
 } from '@material-ui/core';
 
 import {
-  saveSettings,
-  fetchSettings,
-  selectLoading,
-  selectFetchingInterval,
-  selectIsFetchingEnabled,
-  selectNotificationSoundVolume,
-  selectIsNotificationSoundEnabled,
-} from '../../../../store/settings';
+  Settings,
+  storageArea,
+  defaultSettings,
+  storageNamespace,
+  fetchingIntervalOptions,
+  retrieveSettings as apiRetrieveSettings,
+} from '../../../../utils/settings';
 
-import { useAppDispatch, useAppSelector } from '../../../../hooks/store';
-import { fetchingIntervalOptions } from '../../../../store/settings/types';
+import {
+  setStorageItem,
+  onStorageChange,
+  removeChangeListener,
+} from '../../../../utils/storage';
+
+import { playNotificationSound } from '../../../../utils/audio';
 
 const Sidebar = () => {
-  const dispatch = useAppDispatch();
+  const [state, setState] = useState();
+  const [volume, setVolume] = useState(0);
 
-  const isFetchingEnabled = useAppSelector(selectIsFetchingEnabled);
-  const fetchingInterval = useAppSelector(selectFetchingInterval);
-  const isLoading = useAppSelector(selectLoading);
+  const isLoading = !state;
 
-  const isNotificationSoundEnabled = useAppSelector(
-    selectIsNotificationSoundEnabled
-  );
+  const {
+    fetchingInterval,
+    isFetchingEnabled,
+    notificationSoundVolume,
+    isNotificationSoundEnabled,
+  } = { ...defaultSettings, ...(state || {}) };
 
-  const notificationSoundVolume = useAppSelector(selectNotificationSoundVolume);
+  const retrieveSettings = async () => {
+    try {
+      setState(await apiRetrieveSettings());
+      // TODO show UI success
+    } catch (error) {
+      // TODO show UI error
+      console.log(error);
+    }
+  };
 
-  const [volumeLevel, setVolumeLevel] = useState(notificationSoundVolume);
+  const onSettingsChange = async (partialState: Partial<Settings>) => {
+    const previousState = state;
+    const settings = { ...(previousState || {}), ...partialState };
+
+    // @ts-ignore
+    setState(settings);
+
+    try {
+      await setStorageItem(storageNamespace, settings);
+      // TODO show UI success
+    } catch (e) {
+      console.log(e); // TODO show UI warning
+      setState(previousState);
+    }
+  };
+
+  const onVolumeChange = (value: number) => {
+    playNotificationSound(value);
+
+    onSettingsChange({ notificationSoundVolume: value });
+  };
 
   useEffect(() => {
-    dispatch(fetchSettings());
-  }, [dispatch]);
+    setVolume(notificationSoundVolume);
+  }, [notificationSoundVolume]);
 
-  useEffect(
-    () => setVolumeLevel(notificationSoundVolume),
-    [notificationSoundVolume]
-  );
+  useEffect(() => {
+    retrieveSettings();
+
+    const listener = onStorageChange(storageArea, storageNamespace, setState);
+    return () => removeChangeListener(listener);
+  }, []);
 
   return (
     <Card>
@@ -65,7 +101,7 @@ const Sidebar = () => {
         <List>
           <ListItem>
             <ListItemIcon>
-              <Wifi />
+              <PowerSettingsNew />
             </ListItemIcon>
             <ListItemText>Enable fetching</ListItemText>
             <ListItemSecondaryAction>
@@ -74,9 +110,7 @@ const Sidebar = () => {
                 checked={isFetchingEnabled}
                 disabled={isLoading}
                 onChange={(e) =>
-                  dispatch(
-                    saveSettings({ isFetchingEnabled: e.target.checked })
-                  )
+                  onSettingsChange({ isFetchingEnabled: e.target.checked })
                 }
               />
             </ListItemSecondaryAction>
@@ -92,9 +126,9 @@ const Sidebar = () => {
                 value={fetchingInterval}
                 disabled={isLoading || !isFetchingEnabled}
                 onChange={(e) =>
-                  dispatch(
-                    saveSettings({ fetchingInterval: e.target.value as number })
-                  )
+                  onSettingsChange({
+                    fetchingInterval: e.target.value as number,
+                  })
                 }
               >
                 {fetchingIntervalOptions.map((interval) => (
@@ -117,11 +151,9 @@ const Sidebar = () => {
                 checked={isNotificationSoundEnabled}
                 disabled={isLoading || !isFetchingEnabled}
                 onChange={(e) =>
-                  dispatch(
-                    saveSettings({
-                      isNotificationSoundEnabled: e.target.checked,
-                    })
-                  )
+                  onSettingsChange({
+                    isNotificationSoundEnabled: e.target.checked,
+                  })
                 }
               />
             </ListItemSecondaryAction>
@@ -134,14 +166,10 @@ const Sidebar = () => {
             <ListItemText>Volume</ListItemText>
             <Box flex={5} display="flex">
               <Slider
-                value={volumeLevel}
-                onChange={(e, value) => setVolumeLevel(value as number)}
+                value={volume}
+                onChange={(e, value) => setVolume(value as number)}
                 onChangeCommitted={(e, value) =>
-                  dispatch(
-                    saveSettings({
-                      notificationSoundVolume: value as number,
-                    })
-                  )
+                  onVolumeChange(value as number)
                 }
                 disabled={
                   isLoading || !isFetchingEnabled || !isNotificationSoundEnabled

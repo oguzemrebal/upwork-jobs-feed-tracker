@@ -1,5 +1,7 @@
-import { Box, Grid, Hidden } from '@material-ui/core';
+import { Grid, Hidden } from '@material-ui/core';
+
 import Sidebar from './Sidebar/Sidebar';
+import JobsList from './JobsList/JobsList';
 
 const Feed = () => (
   <Grid container spacing={3}>
@@ -10,9 +12,7 @@ const Feed = () => (
     </Hidden>
 
     <Grid item md={8} sm={12} xs={12}>
-      <Box width="100%" style={{ background: '#fff' }} height={400}>
-        content
-      </Box>
+      <JobsList />
     </Grid>
   </Grid>
 );
