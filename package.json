@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "@types/chrome": "^0.0.159",
     "@types/jest": "^26.0.15",
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
@@ -24,10 +25,9 @@
   },
   "scripts": {
     "watch": "cra-build-watch",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "react-scripts build && yarn build:background",
+    "build:background": "node_modules/.bin/tsc ./src/background.ts --outFile ./build/background.js --module system --moduleResolution node",
+    "watch:background": "node_modules/.bin/tsc ./src/background.ts --watch --outFile ./build/background.js --module system --moduleResolution node"
   },
   "eslintConfig": {
     "extends": [

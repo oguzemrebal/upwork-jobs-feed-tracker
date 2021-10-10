@@ -1,4 +1,9 @@
-import { getStorageItem } from './storage';
+import {
+  getStorageItem,
+  setStorageItem,
+  onStorageChange,
+  removeChangeListener,
+} from './storage';
 
 export const fetchingIntervalOptions = [1, 5, 10];
 
@@ -15,15 +20,22 @@ export interface Settings {
 export const storageArea = 'sync';
 export const storageNamespace = 'settings';
 
-export const defaultSettings = {
+export const defaultSettings: Settings = {
   fetchingInterval: 1,
   isFetchingEnabled: false,
   notificationSoundVolume: 100,
   isNotificationSoundEnabled: true,
 };
 
-export const retrieveSettings = async () => {
-  const settings = await getStorageItem(storageNamespace);
+export const retrieveSettings = async (): Promise<Settings> =>
+  (await getStorageItem(storageNamespace)) || defaultSettings;
 
-  return { ...defaultSettings, ...settings };
+export const saveSettings = (settings: Settings): Promise<Settings> =>
+  setStorageItem(storageNamespace, settings);
+
+export const onSettingsChanged = (
+  callback: (updatedValue: any, oldValue: any) => void
+) => {
+  const listenerId = onStorageChange(storageArea, storageNamespace, callback);
+  return () => removeChangeListener(listenerId);
 };

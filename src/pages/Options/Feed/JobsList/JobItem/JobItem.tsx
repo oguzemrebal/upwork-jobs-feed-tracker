@@ -1,6 +1,5 @@
 import { Box, Card, Typography, CardContent } from '@material-ui/core';
-
-import { Job } from '../../../../../store/jobs/types';
+import { Job } from '../../../../../utils/jobs';
 
 interface JobItemPropTypes {
   job: Job;

@@ -3,56 +3,67 @@ import { Box, Link } from '@material-ui/core';
 import { Alert, AlertTitle } from '@material-ui/lab';
 
 import {
-  onStorageChange,
-  getLocalStorageItem,
-  removeChangeListener,
-} from '../../../../utils/storage';
+  Job,
+  onJobsChange,
+  retrieveJobs as apiRetrieveJobs,
+} from '../../../../utils/jobs';
 
 import JobItem from './JobItem/JobItem';
-import { Job } from '../../../../store/jobs/types';
-
-export const storageArea = 'local';
-export const storageNamespace = 'jobs';
+import { filtersWarning } from '../../../../utils/links';
+import JobItemLoading from './JobItemLoading/JobItemLoading';
 
 const JobsList = () => {
-  const [jobs, setJobs] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+  const [jobs, setJobs] = useState([] as Job[]);
 
-  const retrieveJobs = async () =>
-    setJobs(await getLocalStorageItem(storageNamespace));
+  const retrieveJobs = async () => {
+    try {
+      const payload = await apiRetrieveJobs();
 
-  const showJobs = Array.isArray(jobs) && jobs.length > 0;
-  const showEmptyMessage = !jobs || (Array.isArray(jobs) && jobs.length === 0);
+      setLoaded(true);
+      setJobs(payload);
+    } catch (error) {
+      // TODO show UI error
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     retrieveJobs();
 
-    const listener = onStorageChange(storageArea, storageNamespace, setJobs);
-    return () => removeChangeListener(listener);
+    return onJobsChange(setJobs);
   }, []);
 
-  return (
-    <div>
-      {showJobs &&
-        jobs.map((job: Job) => (
-          <JobItem job={job} key={`job-item-${job.cipherText}`} />
-        ))}
+  if (!loaded || !Array.isArray(jobs)) {
+    return (
+      <>
+        <JobItemLoading />
+        <JobItemLoading />
+        <JobItemLoading />
+      </>
+    );
+  }
 
-      {showEmptyMessage && (
-        <Box maxWidth={400}>
-          <Alert severity="info">
-            <AlertTitle>No jobs yet</AlertTitle>
-            Consider&nbsp;
-            <Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/neeilya/upwork-jobs-feed-tracker#warning-to-freelancers"
-            >
-              configuring filters.
-            </Link>
-          </Alert>
-        </Box>
-      )}
-    </div>
+  if (jobs.length === 0) {
+    return (
+      <Box maxWidth={400}>
+        <Alert severity="info">
+          <AlertTitle>No jobs yet</AlertTitle>
+          Consider&nbsp;
+          <Link target="_blank" href={filtersWarning} rel="noopener noreferrer">
+            configuring filters.
+          </Link>
+        </Alert>
+      </Box>
+    );
+  }
+
+  return (
+    <>
+      {jobs.map((job) => (
+        <JobItem job={job} key={`job-item-${job.cipherText}`} />
+      ))}
+    </>
   );
 };
 

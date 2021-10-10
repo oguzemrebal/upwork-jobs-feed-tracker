@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Skeleton } from '@material-ui/lab';
 
 import {
   Update,
@@ -8,9 +9,9 @@ import {
 } from '@material-ui/icons';
 
 import {
+  Box,
   Card,
   List,
-  Box,
   Switch,
   Select,
   Slider,
@@ -24,38 +25,33 @@ import {
 
 import {
   Settings,
-  storageArea,
   defaultSettings,
-  storageNamespace,
+  onSettingsChanged,
   fetchingIntervalOptions,
+  saveSettings as apiSaveSettings,
   retrieveSettings as apiRetrieveSettings,
 } from '../../../../utils/settings';
-
-import {
-  setStorageItem,
-  onStorageChange,
-  removeChangeListener,
-} from '../../../../utils/storage';
 
 import { playNotificationSound } from '../../../../utils/audio';
 
 const Sidebar = () => {
-  const [state, setState] = useState();
   const [volume, setVolume] = useState(0);
-
-  const isLoading = !state;
+  const [loaded, setLoaded] = useState(false);
+  const [settings, setSettings] = useState(defaultSettings);
 
   const {
     fetchingInterval,
     isFetchingEnabled,
     notificationSoundVolume,
     isNotificationSoundEnabled,
-  } = { ...defaultSettings, ...(state || {}) };
+  } = settings;
 
   const retrieveSettings = async () => {
     try {
-      setState(await apiRetrieveSettings());
-      // TODO show UI success
+      const payload = await apiRetrieveSettings();
+
+      setLoaded(true);
+      setSettings(payload);
     } catch (error) {
       // TODO show UI error
       console.log(error);
@@ -63,18 +59,18 @@ const Sidebar = () => {
   };
 
   const onSettingsChange = async (partialState: Partial<Settings>) => {
-    const previousState = state;
-    const settings = { ...(previousState || {}), ...partialState };
+    const previousState = settings;
+    const newSettings = { ...previousState, ...partialState };
 
-    // @ts-ignore
-    setState(settings);
+    setSettings(newSettings);
 
     try {
-      await setStorageItem(storageNamespace, settings);
-      // TODO show UI success
+      await apiSaveSettings(newSettings);
     } catch (e) {
-      console.log(e); // TODO show UI warning
-      setState(previousState);
+      // TODO show UI warning
+      console.log(e);
+
+      setSettings(previousState);
     }
   };
 
@@ -91,9 +87,12 @@ const Sidebar = () => {
   useEffect(() => {
     retrieveSettings();
 
-    const listener = onStorageChange(storageArea, storageNamespace, setState);
-    return () => removeChangeListener(listener);
+    return onSettingsChanged(setSettings);
   }, []);
+
+  if (!loaded) {
+    return <Skeleton variant="rect" height={200} width="100%" />;
+  }
 
   return (
     <Card>
@@ -108,7 +107,6 @@ const Sidebar = () => {
               <Switch
                 color="primary"
                 checked={isFetchingEnabled}
-                disabled={isLoading}
                 onChange={(e) =>
                   onSettingsChange({ isFetchingEnabled: e.target.checked })
                 }
@@ -124,7 +122,7 @@ const Sidebar = () => {
             <ListItemSecondaryAction>
               <Select
                 value={fetchingInterval}
-                disabled={isLoading || !isFetchingEnabled}
+                disabled={!isFetchingEnabled}
                 onChange={(e) =>
                   onSettingsChange({
                     fetchingInterval: e.target.value as number,
@@ -148,8 +146,8 @@ const Sidebar = () => {
             <ListItemSecondaryAction>
               <Switch
                 color="primary"
+                disabled={!isFetchingEnabled}
                 checked={isNotificationSoundEnabled}
-                disabled={isLoading || !isFetchingEnabled}
                 onChange={(e) =>
                   onSettingsChange({
                     isNotificationSoundEnabled: e.target.checked,
@@ -171,9 +169,7 @@ const Sidebar = () => {
                 onChangeCommitted={(e, value) =>
                   onVolumeChange(value as number)
                 }
-                disabled={
-                  isLoading || !isFetchingEnabled || !isNotificationSoundEnabled
-                }
+                disabled={!isFetchingEnabled || !isNotificationSoundEnabled}
               />
             </Box>
           </ListItem>
