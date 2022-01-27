@@ -15,5 +15,9 @@
   ],
   "host_permissions": [
     "https://*.upwork.com/"
-  ]
+  ],
+  "background": {
+    "type": "module",
+    "service_worker": "background.js"
+  }
 }

@@ -1,5 +1,5 @@
-import { getApiInstance } from '../utils/api';
+import axios from 'axios';
 
-export const upworkApi = getApiInstance({
+export const upworkApi = axios.create({
   baseURL: 'https://www.upwork.com/ab',
 });

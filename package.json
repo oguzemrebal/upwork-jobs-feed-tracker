@@ -26,8 +26,8 @@
   "scripts": {
     "watch": "cra-build-watch",
     "build": "react-scripts build && yarn build:background",
-    "build:background": "node_modules/.bin/tsc ./src/background.ts --outFile ./build/background.js --module system --moduleResolution node",
-    "watch:background": "node_modules/.bin/tsc ./src/background.ts --watch --outFile ./build/background.js --module system --moduleResolution node"
+    "build:background": "node_modules/.bin/tsc ./src/background.ts --outDir ./build --module es6 --target es5 --moduleResolution node --isolatedModules false",
+    "watch:background": "node_modules/.bin/tsc ./src/background.ts --watch --outDir ./build --module es6 --target es5 --moduleResolution node --isolatedModules false"
   },
   "eslintConfig": {
     "extends": [

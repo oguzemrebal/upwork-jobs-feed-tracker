@@ -34,7 +34,7 @@ export const saveSettings = (settings: Settings): Promise<Settings> =>
   setStorageItem(storageNamespace, settings);
 
 export const onSettingsChanged = (
-  callback: (updatedValue: any, oldValue: any) => void
+  callback: (updatedValue: Settings, oldValue: Settings) => void
 ) => {
   const listenerId = onStorageChange(storageArea, storageNamespace, callback);
   return () => removeChangeListener(listenerId);
